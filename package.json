@@ -1,7 +1,13 @@
 {
   "name": "nodejs-CRUD_API",
   "version": "0.0.1",
+  "scripts": {
+    "start:dev": "nodemon src/index.ts"
+  },
   "dependencies": {
-    
+    "dotenv": "^16.0.3",
+    "nodemon": "^2.0.20",
+    "ts-node": "^10.9.1",
+    "uuid": "^9.0.0"
   }
 }
