@@ -5,7 +5,6 @@ export const router = async (req: any, res: any) => {
     route.activeRoute.handler(req, res, route.params)
 };
 
-
 const getActiveRoute = (method: string, url: string, routes: any) => {
     const routeParams: any = {};
     const urlSegments = url.split('/').slice(1);
