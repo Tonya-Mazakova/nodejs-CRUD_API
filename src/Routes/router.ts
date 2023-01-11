@@ -1,45 +1,8 @@
-export const router = async (req: any, res: any, routes: any) => {
-    console.log(req.method, 'req', req.url)
+import { routes } from './UserRoute'
 
-    // const route = routes.find((route: any) => {
-    //     const methodMatch = route.method === req.method;
-    //
-    //     return route.method === req.method && route.path === req.url
-    //     // let pathMatch = false;
-    //     //
-    //     // if (typeof route.path === 'object') {
-    //     //     // Path is a RegEx, we use RegEx matching
-    //     //     pathMatch = req.url.match(route.path);
-    //     // }
-    //     // else {
-    //     //     // Path is a string, we simply match with URL
-    //     //     pathMatch = route.path === req.url;
-    //     // }
-    //     //
-    //     // return pathMatch && methodMatch;
-    // });
-
+export const router = async (req: any, res: any) => {
     const route = getActiveRoute(req.method, req.url, routes)
-console.log(route, 'routeroute')
-    // Extract the "id" parameter from route and pass it to controller
-    let param = null;
-
-    // if (route && typeof route.path === 'object') {
-    //     param = req.url.match(route.path)[1];
-    // }
-
-    // Extract request body
-    // if (route) {
-    //     let body = null;
-    //     if (req.method === 'POST' || req.method === 'PUT') {
-    //        // body = await getPostData(req);
-    //     }
-    //
-    //    // return route.handler(req, res, param, body);
-    // }
-    // else {
-    //    // return helpers.error(res, 'Endpoint not found', 404);
-    // }
+    route.activeRoute.handler(req, res, route.params)
 };
 
 

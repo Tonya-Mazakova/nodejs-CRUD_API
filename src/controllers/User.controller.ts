@@ -1,9 +1,11 @@
+import dataStore from '../dataStore/index'
+
 class UserController {
     async getUsers() {
-
+        const users = dataStore.findAll()
     }
 
-    async getUser() {
+    async getUser(req: any, res: any, params: { id: number }) {
 
     }
 

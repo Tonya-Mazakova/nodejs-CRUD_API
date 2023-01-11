@@ -10,6 +10,6 @@ export const routes = [
     {
         method: 'GET',
         path: `/${API_PREFIX}/users/:id`,
-        handler: userController.getUsers.bind(userController)
+        handler: userController.getUser.bind(userController)
     }
 ]

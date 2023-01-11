@@ -5,6 +5,7 @@
     "start:dev": "nodemon src/index.ts"
   },
   "dependencies": {
+    "@types/uuid": "^9.0.0",
     "dotenv": "^16.0.3",
     "nodemon": "^2.0.20",
     "ts-node": "^10.9.1",

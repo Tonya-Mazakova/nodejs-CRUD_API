@@ -1,11 +1,10 @@
 import { createServer } from 'http'
-import { routes } from './Routes/UserRoute'
 import { router } from './Routes/router'
 
 const port = process.env.PORT || 4000
 
 const server = createServer(async (req, res) => {
-    await router(req, res, routes)
+    await router(req, res)
 });
 
 server.listen(port, () => {

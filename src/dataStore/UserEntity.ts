@@ -1,4 +1,4 @@
-interface IUserEntity {
+export interface IUserEntity {
     id: string
     username: string
     age: number

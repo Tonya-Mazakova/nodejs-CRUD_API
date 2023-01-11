@@ -1,8 +1,12 @@
 import { v4 } from 'uuid'
-import { IUsers } from './UserEntity'
+import { IUsers, IUserEntity } from './UserEntity'
 
-export default class DataStore {
+class DataStore {
     private users: IUsers = {}
 
-
+    public async findAll(): Promise<IUserEntity[]> {
+        return Object.values(this.users)
+    }
 }
+
+export default new DataStore()
