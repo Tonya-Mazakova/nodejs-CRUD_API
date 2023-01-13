@@ -1,30 +1,39 @@
 import { routes } from './UserRoute'
+import { HttpRequest, HttpResponse } from '../@types/index.types'
 
-export const router = async (req: any, res: any) => {
+export const router = async (req: HttpRequest, res: HttpResponse) => {
     const route = getActiveRoute(req.method, req.url, routes)
+
+    if (!route.activeRoute) return
+
     route.activeRoute.handler(req, res, route.params)
 };
 
-const getActiveRoute = (method: string, url: string, routes: any) => {
+const getActiveRoute = (
+    method: string | undefined,
+    url: string | undefined,
+    routes: any
+) => {
     const routeParams: any = {};
-    const urlSegments = url.split('/').slice(1);
+    const urlSegments = url?.split('/').slice(1);
 
     const activeRoute = routes.find((route: any) => {
         const routePathSegments = route.path.split('/').slice(1);
 
-        if (routePathSegments.length !== urlSegments.length) {
+        if (routePathSegments.length !== urlSegments?.length
+            || route.method !== method) {
             return false;
         }
 
         const match = routePathSegments.every((routePathSegment: string, i: number) => {
-            return routePathSegment === urlSegments[i] || routePathSegment[0] === ':';
+            return routePathSegment === urlSegments?.[i] || routePathSegment[0] === ':';
         });
 
         if (match) {
             routePathSegments.forEach((segment: string, i: number) => {
                 if (segment[0] === ':') {
                     const propName = segment.slice(1);
-                    routeParams[propName] = decodeURIComponent(urlSegments[i]);
+                    routeParams[propName] = decodeURIComponent(urlSegments?.[i] || '');
                 }
             });
         }

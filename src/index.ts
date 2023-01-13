@@ -1,12 +1,17 @@
-import { createServer } from 'http'
-import { router } from './Routes/router'
+import 'dotenv/config'
+import CrudApiApp from './app'
+import bodyParser from './middlewares/bodyParser.middleware'
+const port = Number(process.env.PORT) || 4000
+const app = new CrudApiApp()
 
-const port = process.env.PORT || 4000
+app.use(bodyParser)
 
-const server = createServer(async (req, res) => {
-    await router(req, res)
-});
+const runServer = (): void => {
+    const server = app.listen(port)
 
-server.listen(port, () => {
-    console.log(`Server is running on Port ${port}`);
-});
+    server.on('listening', () => {
+        console.log(`Server is running on Port ${port}`)
+    })
+}
+
+runServer()

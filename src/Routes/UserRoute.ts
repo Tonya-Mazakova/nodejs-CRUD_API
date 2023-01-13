@@ -11,5 +11,10 @@ export const routes = [
         method: 'GET',
         path: `/${API_PREFIX}/users/:id`,
         handler: userController.getUser.bind(userController)
+    },
+    {
+        method: 'POST',
+        path: `/${API_PREFIX}/users`,
+        handler: userController.postUser.bind(userController)
     }
 ]
