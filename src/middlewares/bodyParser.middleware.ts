@@ -1,6 +1,6 @@
 import { HttpRequest } from '../@types/index.types'
 
-export default(req: HttpRequest) => {
+export const bodyParser = (req: HttpRequest) => {
     let data = ''
 
     req.on('data', (chunk: Buffer) => {

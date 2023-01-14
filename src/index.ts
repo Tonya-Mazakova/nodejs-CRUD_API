@@ -1,6 +1,7 @@
 import 'dotenv/config'
 import CrudApiApp from './app'
-import bodyParser from './middlewares/bodyParser.middleware'
+import { bodyParser } from './middlewares'
+
 const port = Number(process.env.PORT) || 4000
 const app = new CrudApiApp()
 

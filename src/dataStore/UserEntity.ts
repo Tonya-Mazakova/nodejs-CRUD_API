@@ -2,7 +2,7 @@ export interface IUserEntity {
     id: string
     username: string
     age: number
-    hobbies: [string]
+    hobbies: [string] | []
 }
 
 export interface IUsers {

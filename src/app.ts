@@ -1,6 +1,6 @@
 import { createServer, Server } from 'http'
 import { HttpRequest, HttpResponse } from './@types/index.types'
-import { router } from './Routes/router'
+import { router } from './routes/router'
 
 export default class CrudApiApp {
     private middlewares: any = []
