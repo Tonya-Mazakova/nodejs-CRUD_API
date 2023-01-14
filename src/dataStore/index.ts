@@ -12,6 +12,10 @@ class DataStore {
 
         return data
     }
+
+    public async findByID(id: number): Promise<IUserEntity> {
+        return this.users[id]
+    }
 }
 
 export default new DataStore()
