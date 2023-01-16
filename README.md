@@ -1,6 +1,6 @@
 CRUD API
 
-##**How to start:**
+## **How to start:**
 
 1. Clone repository
 2. Checkout to develop branch
@@ -12,13 +12,13 @@ Default port is 4000. You can change port in .env file with
 PORT = port_number
 
 
-##**Usage:**
+## **Usage:**
 1. npm run start:dev - run development mode
 2. npm run start:prod - build and run production mode
 3. npm run start:multi - run horizontal scaling for load balancer mode
 
 
-##**Implemented endpoint: /api/users**
+## **Implemented endpoint: /api/users**
 
 GET /api/users - get all users
 
