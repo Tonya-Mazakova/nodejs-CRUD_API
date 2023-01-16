@@ -13,7 +13,7 @@ export const validateRequestBody = (
     let schemaType
 
     const errors = requiredFields?.reduce((acc: any, reqField: string) => {
-        hasRequiredField = body.hasOwnProperty(reqField)
+        hasRequiredField = Object.prototype.hasOwnProperty.call(body, reqField)
         bodyVal = body?.[reqField]
         schemaType = schema?.[reqField]?.type
 

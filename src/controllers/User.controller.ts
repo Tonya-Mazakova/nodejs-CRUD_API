@@ -124,7 +124,7 @@ class UserController {
         const userIdCheckResult = validateUserID(params?.id)
         const reqBodyCheckResult = validateRequestBody(req.body, userSchema)
         let isUserExist
-        let isValid = userIdCheckResult.isValid && reqBodyCheckResult.isValid
+        const isValid = userIdCheckResult.isValid && reqBodyCheckResult.isValid
 
         try {
             isUserExist = await dataStore.findByID(params?.id)

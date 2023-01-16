@@ -2,17 +2,24 @@
   "name": "nodejs-CRUD_API",
   "version": "0.0.1",
   "scripts": {
-    "start:dev": "nodemon src/index.ts"
+    "start:dev": "nodemon src/index.ts",
+    "start:prod": "npm run build && node dist/index.js",
+    "build": "npm run lint && tsc -p tsconfig.json",
+    "lint": "eslint --ext .ts src"
   },
   "dependencies": {
     "dotenv": "^16.0.3",
     "nodemon": "^2.0.20",
+    "npm": "^8.19.3",
     "ts-node": "^10.9.1",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@types/node": "^18.11.18",
     "@types/uuid": "^9.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.48.1",
+    "@typescript-eslint/parser": "^5.48.1",
+    "eslint": "^8.32.0",
     "typescript": "^4.9.4"
   }
 }
