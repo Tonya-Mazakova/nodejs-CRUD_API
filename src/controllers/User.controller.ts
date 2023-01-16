@@ -7,7 +7,7 @@ import { userSchema } from '../schemas/user.schema'
 import { validateRequestBody, validateUserID } from '../utils'
 
 class UserController {
-    payload = { }
+    payload = { } as any
 
     async getUsers(req: HttpRequest, res: HttpResponse) {
         let users
@@ -25,11 +25,10 @@ class UserController {
             }
         }
 
-        res.writeHead(StatusCodes.Ok, {'Content-Type': 'json/application'});
-        res.end(JSON.stringify(this.payload))
+        res.send?.(this.payload)
     }
 
-    async getUser(req: HttpRequest, res: HttpResponse, params: { id: number }) {
+    async getUser(req: HttpRequest, res: HttpResponse, params: { id: string }) {
         const { isValid, error } = validateUserID(params?.id)
 
         if (!isValid) {
@@ -69,8 +68,7 @@ class UserController {
             }
         }
 
-        res.writeHead(StatusCodes.Ok, {'Content-Type': 'json/application'});
-        res.end(JSON.stringify(this.payload))
+        res.send?.(this.payload)
     }
 
     async postUser(req: HttpRequest, res: HttpResponse): Promise<void> {
@@ -105,16 +103,131 @@ class UserController {
             }
         }
 
-        res.writeHead(StatusCodes.Created, {'Content-Type': 'json/application'});
-        res.end(JSON.stringify(this.payload))
+        res.send?.(this.payload)
     }
 
-    async updateUser() {
-
+    returnErrorPayload(
+        status: StatusCodes,
+        errorMSG: ErrorMessages,
+        error: any
+    ) {
+        return {
+            status,
+            error: {
+                name: errorMSG,
+                message: JSON.stringify(error)
+            },
+        }
     }
 
-    async deleteUser() {
+    async updateUser(req: HttpRequest, res: HttpResponse, params: { id: string }): Promise<void> {
+        const userIdCheckResult = validateUserID(params?.id)
+        const reqBodyCheckResult = validateRequestBody(req.body, userSchema)
+        let isUserExist
+        let isValid = userIdCheckResult.isValid && reqBodyCheckResult.isValid
 
+        try {
+            isUserExist = await dataStore.findByID(params?.id)
+
+            if (!isUserExist) {
+                this.payload =
+                    this.returnErrorPayload(
+                        StatusCodes.NotFound,
+                        ErrorMessages.NOT_FOUND,
+                        'user is not found'
+                    )
+            }
+        } catch (e) {
+            this.payload = this.returnErrorPayload(
+                StatusCodes.ServerError,
+                ErrorMessages.SERVER_ERROR,
+                e
+            )
+        }
+
+        if (!userIdCheckResult.isValid) {
+            this.payload = this.returnErrorPayload(
+                StatusCodes.BadRequest,
+                ErrorMessages.BAD_REQUEST,
+                userIdCheckResult.error
+            )
+        }
+
+        if (!reqBodyCheckResult.isValid) {
+            this.payload = this.returnErrorPayload(
+                StatusCodes.BadRequest,
+                ErrorMessages.BAD_REQUEST,
+                reqBodyCheckResult.errors
+            )
+        }
+
+        let data
+
+        if (isUserExist && isValid) {
+            try {
+                data = await dataStore.updateByID(params.id, req.body as IUserEntity)
+                this.payload = { status: StatusCodes.Ok, data }
+            } catch (e) {
+                this.payload = {
+                    status: StatusCodes.ServerError,
+                    error: {
+                        name: ErrorMessages.SERVER_ERROR,
+                        message: JSON.stringify(e)
+                    }
+                }
+            }
+        }
+
+        res.send?.(this.payload)
+    }
+
+    async deleteUser(req: HttpRequest, res: HttpResponse, params: { id: string }): Promise<void> {
+        const userIdCheckResult = validateUserID(params?.id)
+        let isUserExist
+
+        try {
+            isUserExist = await dataStore.findByID(params?.id)
+
+            if (!isUserExist) {
+                this.payload =
+                    this.returnErrorPayload(
+                        StatusCodes.NotFound,
+                        ErrorMessages.NOT_FOUND,
+                        'user is not found'
+                    )
+            }
+        } catch (e) {
+            this.payload = this.returnErrorPayload(
+                StatusCodes.ServerError,
+                ErrorMessages.SERVER_ERROR,
+                e
+            )
+        }
+
+        if (!userIdCheckResult.isValid) {
+            this.payload = this.returnErrorPayload(
+                StatusCodes.BadRequest,
+                ErrorMessages.BAD_REQUEST,
+                userIdCheckResult.error
+            )
+        }
+
+        if (userIdCheckResult.isValid && isUserExist) {
+            try {
+                const data = await dataStore.deleteByID(params.id)
+                this.payload = { status: StatusCodes.Deleted, data }
+            } catch (e) {
+                this.payload = {
+                    status: StatusCodes.ServerError,
+                    error: {
+                        name: ErrorMessages.SERVER_ERROR,
+                        message: JSON.stringify(e)
+                    }
+                }
+            }
+        }
+
+        res.send?.(this.payload)
     }
 }
 

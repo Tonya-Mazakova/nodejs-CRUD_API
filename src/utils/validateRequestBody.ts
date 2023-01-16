@@ -22,14 +22,20 @@ export const validateRequestBody = (
             return acc
         }
 
+        let typeError
         if (schemaType === 'array') {
             isValidType = Array.isArray(bodyVal)
+                && bodyVal.every((item: any) => typeof item === schema?.[reqField]?.items?.type)
+
+            typeError =
+                `${acc ? ', ' : ''}field '${reqField}' must be of type '${schema?.[reqField]?.type}' of '${schema?.[reqField]?.items?.type}'`
         } else {
             isValidType = typeof bodyVal === schema?.[reqField]?.type
+            typeError = `${acc ? ', ' : ''}field '${reqField}' must be of type '${schema?.[reqField]?.type}'`
         }
 
         if (!isValidType) {
-            acc += `${acc ? ', ' : ''}field '${reqField}' must be '${schema?.[reqField]?.type}'`
+            acc += typeError
         }
 
         return acc

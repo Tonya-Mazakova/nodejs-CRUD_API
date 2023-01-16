@@ -15,7 +15,6 @@ export default class CrudApiApp {
 
             req.on('end', async () => {
                 await router(req, res)
-                res.end()
             })
         })
 

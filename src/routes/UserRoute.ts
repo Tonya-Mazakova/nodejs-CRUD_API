@@ -16,5 +16,15 @@ export const routes = [
         method: 'POST',
         path: `/${API_PREFIX}/users`,
         handler: userController.postUser.bind(userController)
+    },
+    {
+        method: 'PUT',
+        path: `/${API_PREFIX}/users/:id`,
+        handler: userController.updateUser.bind(userController)
+    },
+    {
+        method: 'DELETE',
+        path: `/${API_PREFIX}/users/:id`,
+        handler: userController.deleteUser.bind(userController)
     }
 ]

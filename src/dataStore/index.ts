@@ -13,8 +13,18 @@ class DataStore {
         return data
     }
 
-    public async findByID(id: number): Promise<IUserEntity> {
+    public async findByID(id: string): Promise<IUserEntity> {
         return this.users[id]
+    }
+
+    public async updateByID(id: string, data: IUserEntity): Promise<IUserEntity> {
+        this.users[id] = {...this.users[id], ...data}
+
+        return this.users[id]
+    }
+
+    public async deleteByID(id: string): Promise<boolean> {
+        return delete this.users[id]
     }
 }
 
