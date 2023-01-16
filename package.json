@@ -5,7 +5,8 @@
     "start:dev": "nodemon src/index.ts",
     "start:prod": "npm run build && node dist/index.js",
     "build": "npm run lint && tsc -p tsconfig.json",
-    "lint": "eslint --ext .ts src"
+    "lint": "eslint --ext .ts src",
+    "start:multi": "tsc && node ./dist/index.js cluster"
   },
   "dependencies": {
     "dotenv": "^16.0.3",

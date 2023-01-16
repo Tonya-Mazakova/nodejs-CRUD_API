@@ -1,12 +1,18 @@
+import cluster from 'cluster'
 import { routes } from './UserRoute'
 import { HttpRequest, HttpResponse } from '../@types/index.types'
+import { isClusterMode } from '../index'
 
 export const router = async (req: HttpRequest, res: HttpResponse) => {
     const route = getActiveRoute(req.method, req.url, routes)
 
     if (!route.activeRoute) return
 
-    route.activeRoute.handler(req, res, route.params)
+    if (isClusterMode && cluster.isWorker) {
+        route.activeRoute.handlerCluster(req, res, route.params)
+    } else {
+        route.activeRoute.handler(req, res, route.params)
+    }
 };
 
 const getActiveRoute = (

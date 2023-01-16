@@ -1,15 +1,42 @@
 import { v4 as uuid } from 'uuid'
+import EventEmitter from 'events';
 import dataStore from '../dataStore/index'
 import { IUserEntity } from '../dataStore/UserEntity'
 import { StatusCodes, ErrorMessages } from '../constants'
 import { HttpRequest, HttpResponse } from '../@types/index.types'
 import { userSchema } from '../schemas/user.schema'
 import { validateRequestBody, validateUserID } from '../utils'
+import {isClusterMode} from "../index";
 
-class UserController {
+export class UserController extends EventEmitter {
     payload = { } as any
+    res: any
+    methods = {
+        'getUsers': this.getUsers
+    }
 
-    async getUsers(req: HttpRequest, res: HttpResponse) {
+    private sendToMaster = async (
+        data: any
+    ): Promise<any> => {
+        return new Promise(
+            (resolve) =>
+                process.send &&
+                process.send(data, () => {
+                    this.once(data.method, (data: any) =>
+                    {
+                        console.log(data, '1')
+                        resolve({
+                            handler: data.handler,
+                            status: data.statusCode,
+                            body: data.body
+                        })
+                    }
+                    );
+                })
+        );
+    };
+
+    async getUsers(req?: HttpRequest, res?: HttpResponse) {
         let users
 
         try {
@@ -25,15 +52,27 @@ class UserController {
             }
         }
 
-        res.send?.(this.payload)
+        if (isClusterMode) {
+            return this.payload
+        }
+
+        res?.send?.(this.payload)
     }
 
-    async getUser(req: HttpRequest, res: HttpResponse, params: { id: string }) {
+    async getUsersClusterMode(req: HttpRequest, res: HttpResponse) {
+        this.res = res
+
+        return await this.sendToMaster({
+            method: 'GET'
+        })
+    }
+
+    async getUser(req: HttpRequest | undefined, res: HttpResponse | undefined, params: { id: string }) {
         const { isValid, error } = validateUserID(params?.id)
 
         if (!isValid) {
-            res.writeHead(StatusCodes.BadRequest, {'Content-Type': 'json/application'});
-            res.end(JSON.stringify({
+            res?.writeHead(StatusCodes.BadRequest, {'Content-Type': 'json/application'});
+            res?.end(JSON.stringify({
                 status: StatusCodes.BadRequest,
                 error: {
                     name: ErrorMessages.BAD_REQUEST,
@@ -68,15 +107,28 @@ class UserController {
             }
         }
 
-        res.send?.(this.payload)
+        if (isClusterMode) {
+            return this.payload
+        }
+
+        res?.send?.(this.payload)
     }
 
-    async postUser(req: HttpRequest, res: HttpResponse): Promise<void> {
+    async getUserClusterMode(req: HttpRequest, res: HttpResponse, params: { id: string }) {
+        this.res = res
+
+        return await this.sendToMaster({
+            method: 'GET',
+            id: params.id
+        })
+    }
+
+    async postUser(req: HttpRequest | any, res: HttpResponse | undefined): Promise<void> {
         const { isValid, errors } = validateRequestBody(req.body, userSchema)
 
         if (!isValid) {
-            res.writeHead(StatusCodes.BadRequest, {'Content-Type': 'json/application'});
-            res.end(JSON.stringify({
+            res?.writeHead(StatusCodes.BadRequest, {'Content-Type': 'json/application'});
+            res?.end(JSON.stringify({
                 status: StatusCodes.BadRequest,
                 error: {
                     name: ErrorMessages.BAD_REQUEST,
@@ -103,7 +155,25 @@ class UserController {
             }
         }
 
-        res.send?.(this.payload)
+        if (isClusterMode) {
+            return this.payload
+        }
+
+        res?.send?.(this.payload)
+    }
+
+    async postUserClusterMode(req: HttpRequest, res: HttpResponse) {
+        this.res = res
+
+        return await this.sendToMaster({
+            method: 'POST',
+            body: req.body
+        })
+    }
+
+    async emitData(method: any, data: any) {
+        this.payload = { status: StatusCodes.Created, data }
+        this.res.send?.(this.payload)
     }
 
     returnErrorPayload(
@@ -120,7 +190,7 @@ class UserController {
         }
     }
 
-    async updateUser(req: HttpRequest, res: HttpResponse, params: { id: string }): Promise<void> {
+    async updateUser(req: HttpRequest | any, res: HttpResponse | any, params: { id: string }): Promise<void> {
         const userIdCheckResult = validateUserID(params?.id)
         const reqBodyCheckResult = validateRequestBody(req.body, userSchema)
         let isUserExist
@@ -178,10 +248,24 @@ class UserController {
             }
         }
 
+        if (isClusterMode) {
+            return this.payload
+        }
+
         res.send?.(this.payload)
     }
 
-    async deleteUser(req: HttpRequest, res: HttpResponse, params: { id: string }): Promise<void> {
+    async updateUserClusterMode(req: HttpRequest, res: HttpResponse, params: { id: string }) {
+        this.res = res
+
+        return await this.sendToMaster({
+            method: 'PUT',
+            body: req.body,
+            id: params.id
+        })
+    }
+
+    async deleteUser(req: HttpRequest | any, res: HttpResponse | any, params: { id: string }): Promise<void> {
         const userIdCheckResult = validateUserID(params?.id)
         let isUserExist
 
@@ -228,6 +312,15 @@ class UserController {
         }
 
         res.send?.(this.payload)
+    }
+
+    async deleteUserClusterMode(req: HttpRequest, res: HttpResponse, params: { id: string }) {
+        this.res = res
+
+        return await this.sendToMaster({
+            method: 'DELETE',
+            id: params.id
+        })
     }
 }
 
